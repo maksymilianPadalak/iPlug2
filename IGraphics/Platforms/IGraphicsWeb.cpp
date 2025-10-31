@@ -530,8 +530,8 @@ void IGraphicsWeb::OnMainLoopTimer()
   IRECTList rects;
   int screenScale = (int) std::ceil(std::max(emscripten_get_device_pixel_ratio(), 1.));
   
-  // Don't draw if there are no graphics or if assets are still loading
-  if (!gGraphics || !gGraphics->AssetsLoaded())
+  // Don't draw if there are no graphics
+  if (!gGraphics)
     return;
   
   if (screenScale != gGraphics->GetScreenScale())

@@ -112,11 +112,11 @@ if [ "$WEBSOCKET_MODE" -eq "0" ]; then
 
   cd $PROJECT_ROOT/build-web/scripts
 
-  # prefix the -wam.js script with scope
-  echo "AudioWorkletGlobalScope.WAM = AudioWorkletGlobalScope.WAM || {}; \
-        AudioWorkletGlobalScope.WAM.$PROJECT_NAME = { ENVIRONMENT: 'WEB' }; \
-        const ModuleFactory = AudioWorkletGlobalScope.WAM.$PROJECT_NAME;" > $PROJECT_NAME-wam.tmp.js;
-  cat $PROJECT_NAME-wam.js >> $PROJECT_NAME-wam.tmp.js
+  # Don't prefix - let emscripten create Module directly
+  # Just ensure AudioWorkletGlobalScope.WAM exists at the top
+  echo "AudioWorkletGlobalScope.WAM = AudioWorkletGlobalScope.WAM || {}; AudioWorkletGlobalScope.WAM.$PROJECT_NAME = { ENVIRONMENT: 'WEB' };" > $PROJECT_NAME-wam.tmp.js;
+  # Read the original file and replace "var Module" with the AudioWorkletGlobalScope assignment
+  sed 's/var Module=typeof Module!="undefined"?Module:{}/var Module=typeof AudioWorkletGlobalScope.WAM.'$PROJECT_NAME'!=="undefined"?AudioWorkletGlobalScope.WAM.'$PROJECT_NAME':{}/' $PROJECT_NAME-wam.js >> $PROJECT_NAME-wam.tmp.js
   mv $PROJECT_NAME-wam.tmp.js $PROJECT_NAME-wam.js
   
   # copy in WAM SDK and AudioWorklet polyfill scripts
